@@ -31,7 +31,6 @@ abstract class Bundle extends BaseBundle
         );
 
         if (null !== $this->getEntityPath()) {
-            var_dump($this->getMapping());
             $container->addCompilerPass(DoctrineOrmMappingsPass::createXmlMappingDriver(
                 $this->getMapping(),
                 array('doctrine.orm.entity_manager'),
