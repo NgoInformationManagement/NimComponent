@@ -17,6 +17,16 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 abstract class NIMType extends AbstractType
 {
     /**
+     * @var string
+     */
+    protected $dataClass;
+
+    /**
+     * @var array
+     */
+    protected $validationGroups;
+
+    /**
      * Constructor.
      *
      * @param string $dataClass
