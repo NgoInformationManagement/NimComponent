@@ -1,7 +1,7 @@
 {
     "name": "nim/nim-component",
     "type": "symfony-bundle",
-    "description": "Nim application component",
+    "description": "Nim application components",
     "keywords": ["nim", "components"],
     "homepage": "https://github.com/NgoInformationManagement/NimComponent",
     "license": "MIT",
@@ -15,13 +15,17 @@
 
     "minimum-stability": "dev",
 
-    "target-dir": "NIM\\Component",
+    "target-dir": "NIM/Component",
 
     "require": {
         "php": ">=5.3.3",
         "symfony/framework-bundle": "~2.3",
         "doctrine/doctrine-bundle": "dev-master",
         "twig/extensions": "~1.0"
+    },
+
+    "config": {
+        "bin-dir": "bin"
     },
 
     "require-dev": {
