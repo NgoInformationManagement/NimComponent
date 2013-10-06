@@ -14,8 +14,8 @@ namespace NIM\Component\Model;
 
 trait EditableModelTrait
 {
-    private $updatedAt;
-    private $createdAt;
+    protected $updatedAt;
+    protected $createdAt;
 
     /**
      * @param mixed $createdAt
