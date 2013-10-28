@@ -14,7 +14,6 @@ namespace NIM\Component;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Compiler\ResolveDoctrineTargetEntitiesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\Bundle as BaseBundle;
 
 abstract class Bundle extends BaseBundle
@@ -32,13 +31,11 @@ abstract class Bundle extends BaseBundle
         );
 
         if (null !== $this->getEntityPath()) {
-            foreach ($this->getMapping() as $key => $value) {
-                $container->addCompilerPass(DoctrineOrmMappingsPass::createXmlMappingDriver(
-                    array($key => $value),
-                    array('doctrine.orm.entity_manager'),
-                    $this->getBundlePrefix().'.driver.doctrine/orm'
-                ));
-            }
+            $container->addCompilerPass(DoctrineOrmMappingsPass::createXmlMappingDriver(
+                $this->getMapping(),
+                array('doctrine.orm.entity_manager'),
+                $this->getBundlePrefix().'.driver.doctrine/orm'
+            ));
         }
     }
 
@@ -73,21 +70,11 @@ abstract class Bundle extends BaseBundle
      */
     protected function getMapping()
     {
-        $mapping = array();
+        $entityPath = sprintf("%s\\%s", $this->getNamespace(), ucfirst($this->getEntityPath()));
 
-        $xmlRootDir = $this->getXmlFilesPath($this->getEntityPath());
-        $entityNamespace = $this->getEntityNamespace($this->getEntityPath());
-
-        //$mapping[$xmlRootDir] = $entityNamespace;
-
-        $finder = new Finder();
-        $finder->directories()->in($xmlRootDir);
-
-        foreach ($finder as $dir) {
-            $mapping[$dir->getRealpath()] = $this->getEntityNamespace($dir->getRelativePathname(), $entityNamespace);
-        }
-        $mapping[$xmlRootDir] = $entityNamespace;
-        return $mapping;
+        return array(
+            $this->getXmlFilesPath() => $entityPath,
+        );
     }
 
     /**
@@ -96,33 +83,15 @@ abstract class Bundle extends BaseBundle
      * @return string
      * @throws \Exception
      */
-    protected function getXmlFilesPath($entityPath)
+    protected function getXmlFilesPath()
     {
-        $xmlFilesPath = sprintf("%s/Resources/config/doctrine/%s", $this->getPath(), strtolower($entityPath));
+        $xmlFilesPath = sprintf("%s/Resources/config/doctrine/%s", $this->getPath(), strtolower($this->getEntityPath()));
 
         if(false == ($realXmlFilesPath = realpath($xmlFilesPath))) {
             throw new \Exception('');
         }
 
         return $realXmlFilesPath;
-    }
-
-    protected function getEntityNamespace($entityPath, $baseNamespace = null)
-    {
-        if (null == $baseNamespace) {
-            $baseNamespace = $this->getNamespace();
-        }
-
-        if (false !== strpos($entityPath, '/')) {
-            $explodedPath = explode('/', $entityPath);
-
-            $explodedPath = array_map(function ($val) {
-                return ucfirst($val);
-            }, $explodedPath);
-
-            $entityPath = implode('\\', $explodedPath);
-        }
-        return  sprintf("%s\\%s", $baseNamespace, ucfirst($entityPath));
     }
 
     /**
